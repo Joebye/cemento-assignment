@@ -1,3 +1,10 @@
+.data-grid-header {
+  font-style: normal;
+  font-size: 1.1em;
+  font-weight: bold;
+}
+
+
 .App {
   text-align: center;
 }
