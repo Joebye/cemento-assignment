@@ -1,12 +1,16 @@
 import {faker} from '@faker-js/faker';
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridRowId, useGridApiContext } from '@mui/x-data-grid';
 import { Box } from '@mui/material';
 import personConfig from '../config/person-config.json';
 
+import React from 'react';
+
 const {minSalary, maxSalary, departments, minDate, maxDate, amount, minExperience, maxExperience} = personConfig;
 const generateData = (rowCount: number) => {
-    const data= [];
-    for (let i = 0; i < rowCount; i++) {
+   let data: any = {arrayData:[]};
+   const existDataInLS = localStorage.getItem("dataPayload");
+   if (existDataInLS == undefined) {
+   for (let i = 0; i < rowCount; i++) {
         const row = {
             id: faker.string.uuid(),
             orderNum: i+1,
@@ -21,12 +25,35 @@ const generateData = (rowCount: number) => {
             familyStatus: faker.helpers.arrayElement(['married', 'single'])
 
         }; 
-        data.push(row)
+        data.arrayData.push(row)
+        localStorage.setItem("dataPayload", JSON.stringify(data));
+        
     }
-    return data;
+
+   } else {
+        data = JSON.parse(existDataInLS); 
+    }
+    return data.arrayData;
 }
 
+
 const Grid: React.FC= () => {
+    const generData = generateData(amount); 
+
+    const handleProcessRowUpdate = (updRow: any) => {
+       const savedData = JSON.parse(localStorage.getItem("dataPayload")!);
+        
+       savedData.arrayData.forEach((el:any, ind: any) => {
+         if (el.id == updRow.id) {
+            savedData.arrayData[ind] = updRow;
+         }
+        
+       })
+       localStorage.setItem("dataPayload", JSON.stringify(savedData))
+       
+        }
+
+        
     const showUUID = false;
     const columns: GridColDef[] = [
         showUUID &&
@@ -40,39 +67,39 @@ const Grid: React.FC= () => {
         },
         {
             field: "fullName", headerName: 'Full Name', flex: 0.5, headerClassName: 'data-grid-header',
-            align: 'center', headerAlign: 'center'
+            align: 'center', headerAlign: 'center', editable: true
         },
         {
             field: "birthDate", headerName: 'Birthdate', flex: 0.5, headerClassName: 'data-grid-header',
-            align: 'center', headerAlign: 'center'
+            align: 'center', headerAlign: 'center', editable: true,
         },
         {
             field: "salary", headerName: 'Salary, $', flex: 0.5, headerClassName: 'data-grid-header',
-            align: 'center', headerAlign: 'center'
+            align: 'center', headerAlign: 'center', editable: true
         },
         {
             field: "department", headerName: 'Department', flex: 0.5, headerClassName: 'data-grid-header',
-            align: 'center', headerAlign: 'center'
+            align: 'center', headerAlign: 'center', editable: true
         },
         {
             field: "phoneNumber", headerName: 'Phone Number', flex: 0.5, headerClassName: 'data-grid-header',
-            align: 'center', headerAlign: 'center'
+            align: 'center', headerAlign: 'center', editable: true
         },
         {
             field: "familyStatus", headerName: 'Family Status', flex: 0.5, headerClassName: 'data-grid-header',
-            align: 'center', headerAlign: 'center'
+            align: 'center', headerAlign: 'center', editable: true
         },
         {
             field: "jobType", headerName: 'Job Type', flex: 0.5, headerClassName: 'data-grid-header',
-            align: 'center', headerAlign: 'center'
+            align: 'center', headerAlign: 'center', editable: true
         },
         {
             field: "workExperience", headerName: 'Work Experience, full years', flex: 0.5, headerClassName: 'data-grid-header',
-            align: 'center', headerAlign: 'center'
+            align: 'center', headerAlign: 'center', editable: true
         },
         {
             field: "ccNumber", headerName: 'Salary Account', flex: 0.5, headerClassName: 'data-grid-header',
-            align: 'center', headerAlign: 'center'
+            align: 'center', headerAlign: 'center', editable: true
         },
         
     ].filter(Boolean) as GridColDef[]
@@ -80,7 +107,10 @@ const Grid: React.FC= () => {
 
 
 return <Box sx={{ height: '90vh', margin: '15px' }}>
-<DataGrid columns={columns} rows={generateData(amount)}/>
+<DataGrid 
+processRowUpdate={handleProcessRowUpdate}
+editMode='row'
+columns={columns} rows={generData}/>
 </Box>
 
 }
