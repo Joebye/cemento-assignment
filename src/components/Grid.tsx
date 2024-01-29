@@ -26,10 +26,8 @@ const generateData = (rowCount: number) => {
 
         }; 
         data.arrayData.push(row)
+     }
         localStorage.setItem("dataPayload", JSON.stringify(data));
-        
-    }
-
    } else {
         data = JSON.parse(existDataInLS); 
     }
@@ -39,6 +37,8 @@ const generateData = (rowCount: number) => {
 
 const Grid: React.FC= () => {
     const generData = generateData(amount); 
+    console.log(generData.length);
+    
 
     const handleProcessRowUpdate = (updRow: any) => {
        const savedData = JSON.parse(localStorage.getItem("dataPayload")!);
